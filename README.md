@@ -29,7 +29,7 @@ Bumbu is a Symfony library inspired by Lombok, designed to reduce boilerplate co
 To install Bumbu, use Composer:
 
 ```bash
-composer require dkart/bumbu
+composer require dkart/bumbu:v1.0.1-beta
 ```
 
 ## Configuration

@@ -24,13 +24,12 @@ class RequestBodyArgumentResolver implements ValueResolverInterface
     {
     }
 
-    public function supports(Request $request, ArgumentMetadata $argument): bool
-    {
-        return count($argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF)) > 0;
-    }
-
     public function resolve(Request $request, ArgumentMetadata $argument): Generator
     {
+        if (!count($argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF))) {
+            return [];
+        }
+
         try {
             $model = $this->serializer->deserialize(
                 $request->getContent(),
