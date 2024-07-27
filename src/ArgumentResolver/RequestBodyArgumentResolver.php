@@ -6,18 +6,20 @@ use DKart\Bumbu\Attribute\RequestBody;
 use DKart\Bumbu\Attribute\Valid;
 use DKart\Bumbu\Exception\RequestBodyConvertException;
 use DKart\Bumbu\Exception\ValidationException;
+use Generator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Throwable;
 
 class RequestBodyArgumentResolver implements ValueResolverInterface
 {
     public function __construct(
         private readonly SerializerInterface $serializer,
-        private readonly ValidatorInterface $validator
+        private readonly ValidatorInterface  $validator
     )
     {
     }
@@ -27,7 +29,7 @@ class RequestBodyArgumentResolver implements ValueResolverInterface
         return count($argument->getAttributes(RequestBody::class, ArgumentMetadata::IS_INSTANCEOF)) > 0;
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): \Generator
+    public function resolve(Request $request, ArgumentMetadata $argument): Generator
     {
         try {
             $model = $this->serializer->deserialize(
@@ -35,7 +37,7 @@ class RequestBodyArgumentResolver implements ValueResolverInterface
                 $argument->getType(),
                 JsonEncoder::FORMAT
             );
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             throw new RequestBodyConvertException($throwable);
         }
 
@@ -43,7 +45,7 @@ class RequestBodyArgumentResolver implements ValueResolverInterface
 
             $errors = $this->validator->validate($model);
 
-            if (!empty($errors)) {
+            if ($errors->count()) {
                 throw new ValidationException($errors);
             }
         }

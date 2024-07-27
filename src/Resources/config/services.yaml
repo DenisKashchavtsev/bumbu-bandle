@@ -2,6 +2,18 @@ services:
   _defaults:
     autowire: true
 
+  #Validation
   DKart\Bumbu\ArgumentResolver\RequestBodyArgumentResolver:
     tags:
       - { name: 'controller.argument_value_resolver', priority: 1 }
+
+  #Magic
+  DKart\Bumbu\Normalizer\Proxy\ProxyFactory:
+    arguments: [ ]
+
+  DKart\Bumbu\Normalizer\BumbuObjectNormalizer:
+    arguments:
+      $proxyFactory: '@DKart\Bumbu\Normalizer\Proxy\ProxyFactory'
+      $kernel: '@kernel'
+    tags:
+      - { name: 'serializer.normalizer', priority: 1 }

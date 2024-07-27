@@ -12,12 +12,10 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('bumbu');
         $rootNode = $treeBuilder->getRootNode();
 
-        // Define the parameters that are allowed to configure your bundle.
         $rootNode
             ->children()
             ->scalarNode('some_parameter')->defaultValue('default_value')->end()
-            ->end()
-        ;
+            ->end();
 
         return $treeBuilder;
     }

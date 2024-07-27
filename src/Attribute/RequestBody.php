@@ -2,7 +2,9 @@
 
 namespace DKart\Bumbu\Attribute;
 
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
+use Attribute;
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
 class RequestBody
 {
 }
