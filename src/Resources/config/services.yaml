@@ -10,10 +10,3 @@ services:
   #Magic
   DKart\Bumbu\Normalizer\Proxy\ProxyFactory:
     arguments: [ ]
-
-  DKart\Bumbu\Normalizer\BumbuObjectNormalizer:
-    arguments:
-      $proxyFactory: '@DKart\Bumbu\Normalizer\Proxy\ProxyFactory'
-      $kernel: '@kernel'
-    tags:
-      - { name: 'serializer.normalizer', priority: 1 }

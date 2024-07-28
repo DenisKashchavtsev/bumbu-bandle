@@ -1,6 +1,6 @@
 <?php
 
-namespace DKart\Bumbu\Normalizer\AttributeStrategy;
+namespace DKart\Bumbu\Compiler\AttributeStrategy;
 
 use ReflectionProperty;
 

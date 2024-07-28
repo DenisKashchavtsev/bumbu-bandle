@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace DKart\Bumbu\Normalizer\Proxy;
+namespace DKart\Bumbu\Compiler\Proxy;
 
 use ReflectionClass;
 use RuntimeException;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * This factory is used to create proxy objects for classes at runtime.
@@ -16,13 +16,12 @@ class ProxyFactory
     const CACHE_DIR = '/bumbu/proxies';
     const CLASS_PREFIX = 'Proxy';
     private ReflectionClass $reflectionClass;
-    private KernelInterface $kernel;
+    private ContainerBuilder $container;
 
-    public function generateProxyClass(ReflectionClass $reflectionClass, KernelInterface $kernel, array $attributes): string
+    public function generateProxyClass(ReflectionClass $reflectionClass, array $attributes, ContainerBuilder $container): string
     {
-
         $this->reflectionClass = $reflectionClass;
-        $this->kernel = $kernel;
+        $this->container = $container;
 
         $classCode = file_get_contents($reflectionClass->getFileName());
         $classCode = $this->modifyClassName($classCode);
@@ -43,12 +42,13 @@ class ProxyFactory
 
     private function modifyClassName(string $classCode): string
     {
-        $pattern = '/\bclass\s+\w+\s*{.*$/s';// заменяя содержание
+        $pattern = '/\bclass\s+\w+\s*{.*$/s';
 
         $namespace = explode('\\', $this->reflectionClass->getName());
         $className = end($namespace);
 
-        $replacement = 'class ' . $className . self::CLASS_PREFIX . ' extends ' . $className . PHP_EOL . ' {' . PHP_EOL . '}'; // заменяя содержание
+        $replacement = 'class ' . $className . self::CLASS_PREFIX
+            . ' extends ' . $className . PHP_EOL . ' {' . PHP_EOL . '}';
 
         return preg_replace($pattern, $replacement, $classCode);
     }
@@ -68,12 +68,19 @@ class ProxyFactory
 
     private function getProxyPath(): string
     {
-        return $this->kernel->getCacheDir() . self::CACHE_DIR . str_replace($this->kernel->getProjectDir(), '', $this->reflectionClass->getFileName());
+        return $this->container->getParameter('kernel.cache_dir')
+            . self::CACHE_DIR
+            . str_replace(
+                $this->container->getParameter('kernel.project_dir'),
+                '',
+                $this->reflectionClass->getFileName());
     }
 
     private function runProxyClass(): string
     {
-        require $this->getProxyPath();
+        if (!class_exists($this->getProxyName())) {
+            require $this->getProxyPath();
+        }
 
         return $this->getProxyName();
     }

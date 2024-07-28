@@ -1,17 +1,15 @@
 <?php
 
-namespace DKart\Bumbu\Normalizer\AttributeStrategy;
+namespace DKart\Bumbu\Compiler\AttributeStrategy;
 
 use ReflectionProperty;
 
-class Setter implements AttributeStrategy
+class Getter implements AttributeStrategy
 {
     private const TEMPLATE = '
-    public function set<Name>(<null><type> $<name>): self 
+    public function get<Name>(): <null><type>
     {
-        $this-><name> = $<name>;
-        
-        return $this;
+        return $this-><name>;
     }';
 
     public static function modifyClass(string $classCode, ReflectionProperty $property): string
